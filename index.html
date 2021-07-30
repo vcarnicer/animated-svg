@@ -32,13 +32,13 @@
             path.stroke({ color: '#f06', width: 4, linecap: 'round', linejoin: 'round' });
             path.mouseover(
                 function(){
-                    path.scale(1.1);
+                    path.stroke({ color: '#039', width: 10, linecap: 'round', linejoin: 'round' });
                 }
             );
                 
             path.mouseout(
                 function(){
-                    path.scale(0.9);
+                    path.stroke({ color: '#930', width: 10, linecap: 'round', linejoin: 'round' });
                 }
             );
         });
