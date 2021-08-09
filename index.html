@@ -32,30 +32,50 @@
         let svg;     
         $(document).ready(function() {            
             svg = SVG().addTo(".svg-container").size(1920, 1080); 
-            creaVarios(10, 'hsl(79, 100%, 37%)', 'hsl(195, 100%, 44%)', 0, 0, 5, 1);           
+            creaVarios(25, 'hsl(195, 100%, 44%)', 'hsl(79, 100%, 37%)', 0, 0, 3, 1);           
         });
 
         
         function creaVarios(quantity, initColor, endColor, xStep, yStep, rotStep, scale){
             let _initColor = document.createElement("SPAN");
-            _initColor.setAttribute('style', 'stroke: hsl(79, 100%, 37%)');
-            console.log(_initColor.style.stroke);
+            _initColor.setAttribute('style', 'stroke: ' + initColor);
             
             let _endColor = document.createElement("SPAN");
-            _endColor.setAttribute('style', 'stroke: hsl(195, 100%, 44%)');
-            console.log(_endColor.style.stroke);
+            _endColor.setAttribute('style', 'stroke: ' + endColor);
 
-            let rgbColors = _initColor.style.stroke.split("(")[1].split(")")[0].split(",");
-            console.log(rgbColors);
-            let hslColor = rgbToHsl(rgbColors[0], rgbColors[1], rgbColors[2]);
-            console.log(hslColor);
+            let initColorRgb = _initColor.style.stroke.split("(")[1].split(")")[0].split(",");
+            let initColorHsl = rgbToHsl(initColorRgb[0], initColorRgb[1], initColorRgb[2]);
+            initColorHsl[0] *= 360;
+            initColorHsl[1] *= 100;
+            initColorHsl[2] *= 100;
 
-            let temp = document.createElement("SPAN");
-            temp.setAttribute('style', 'stroke: hsl(' + hslColor[0] * 360 + ', ' + hslColor[1] * 100 + '%, ' + hslColor[2] * 100 + '%)');
-            console.log(temp.style.stroke);
+            let endColorRgb = _endColor.style.stroke.split("(")[1].split(")")[0].split(",");
+            let endColorHsl = rgbToHsl(endColorRgb[0], endColorRgb[1], endColorRgb[2]);
+            endColorHsl[0] *= 360;
+            endColorHsl[1] *= 100;
+            endColorHsl[2] *= 100;
 
-            for(let i = 0; i < quantity; i++) {
-                let curva = creaUno(i, i*xStep, i*yStep, i*rotStep, scale, temp.style.stroke);
+            let colorStep = [(endColorHsl[0] - initColorHsl[0]) / quantity, 
+                            (endColorHsl[1] - initColorHsl[1]) / quantity,
+                            (endColorHsl[2] - initColorHsl[2]) / quantity];
+            
+            let currentColor = _initColor;
+            console.log(currentColor);
+
+            for(let i = 0; i < quantity; i++) {                
+                creaUno(i, i*xStep, i*yStep, i*rotStep, scale, currentColor.style.stroke);
+
+                let nextColorRgb = currentColor.style.stroke.split("(")[1].split(")")[0].split(",");
+                let nextColorHsl = rgbToHsl(nextColorRgb[0], nextColorRgb[1], nextColorRgb[2]);
+                nextColorHsl[0] *= 360;
+                nextColorHsl[1] *= 100;
+                nextColorHsl[2] *= 100;
+
+                nextColorHsl[0] += colorStep[0];
+                nextColorHsl[1] += colorStep[1];
+                nextColorHsl[2] += colorStep[2];
+
+                currentColor.setAttribute('style', 'stroke: hsl(' + nextColorHsl[0] + ', ' + nextColorHsl[1] + '%, ' + nextColorHsl[2]  + '%)');
             }
         }
         
@@ -75,13 +95,13 @@
             
             path.mouseover(
                 function(){
-                    path.stroke({ color: 'hsl(195, 100%, 44%)', width: 20, linecap: 'round', linejoin: 'round' });
+                    path.stroke({ color: 'hsl(195, 100%, 44%)', width: 20 });
                 }
             );
                 
             path.mouseout(
                 function(){
-                    path.stroke({ color: color, width: 15, linecap: 'round', linejoin: 'round' });
+                    path.stroke({ color: color, width: 15 });
                 }
             );
 
@@ -101,9 +121,9 @@
                 s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
                 switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                case g: h = (b - r) / d + 2; break;
-                case b: h = (r - g) / d + 4; break;
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
                 }
 
                 h /= 6;
