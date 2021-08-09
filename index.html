@@ -19,13 +19,13 @@
 
 <body>
     <h1>Animated SVG Example</h1>
-    <div class="svg-container">
-        <!--Comentada abajo sería la manera normal de cargarlo, sea hardcoded o cargando desde el fichero curve.svg incluido.
-            En este elemento se inserta un único elemento <svg> que tiene dentro (agrupa) los distintos <path>-->
-
-            <!--<svg id="curve" width="1440" height="675" viewBox="0 0 1440 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div class="svg-container">            
+        <!-- In this "svg-container" div we will insert a single <svg>, which nests the generated <path> inside. -->
+        <!-- The next comment would be the normal way of loading an SVG, being hardcoded or loaded from the curve.svg file included in this repo. -->
+        <!-- <svg id="curve" width="1920" height="1080" viewBox="0 0 1440 675" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path id="svgpath" d="" stroke="#001EFF" stroke-width="3" stroke-linecap="round"/>
-            </svg>-->
+            </svg> -->
+        <!--With the help of the SVG.JS library we can manipulate all those properties inside an SVG.-->
     </div>
     
     <script>   
@@ -34,53 +34,47 @@
             svg = SVG().addTo(".svg-container").size(1920, 1080); 
             creaVarios(25, 'hsl(195, 100%, 44%)', 'hsl(79, 100%, 37%)', 0, 0, 3, 1);           
         });
-
         
         function creaVarios(quantity, initColor, endColor, xStep, yStep, rotStep, scale){
-            let _initColor = document.createElement("SPAN");
-            _initColor.setAttribute('style', 'stroke: ' + initColor);
+            /*** Calculating the color step we need for the gradient ***/ 
+
+            /* We're applying the color style to a temp span, which always gives RGB format when you retrieve it, no matter what format you set it in. */
+            let initColorSpan = document.createElement("SPAN");
+            initColorSpan.setAttribute('style', 'stroke: ' + initColor);
             
-            let _endColor = document.createElement("SPAN");
-            _endColor.setAttribute('style', 'stroke: ' + endColor);
+            let endColorSpan = document.createElement("SPAN");
+            endColorSpan.setAttribute('style', 'stroke: ' + endColor);
 
-            let initColorRgb = _initColor.style.stroke.split("(")[1].split(")")[0].split(",");
+            /* Splitting RGB and converting into HSL, which I think is more convenient for gradients, since you have Hue, Saturation and Luminance independently */
+            let initColorRgb = initColorSpan.style.stroke.split("(")[1].split(")")[0].split(",");
             let initColorHsl = rgbToHsl(initColorRgb[0], initColorRgb[1], initColorRgb[2]);
-            initColorHsl[0] *= 360;
-            initColorHsl[1] *= 100;
-            initColorHsl[2] *= 100;
 
-            let endColorRgb = _endColor.style.stroke.split("(")[1].split(")")[0].split(",");
+            let endColorRgb = endColorSpan.style.stroke.split("(")[1].split(")")[0].split(",");
             let endColorHsl = rgbToHsl(endColorRgb[0], endColorRgb[1], endColorRgb[2]);
-            endColorHsl[0] *= 360;
-            endColorHsl[1] *= 100;
-            endColorHsl[2] *= 100;
 
             let colorStep = [(endColorHsl[0] - initColorHsl[0]) / quantity, 
                             (endColorHsl[1] - initColorHsl[1]) / quantity,
-                            (endColorHsl[2] - initColorHsl[2]) / quantity];
+                            (endColorHsl[2] - initColorHsl[2]) / quantity];            
             
-            let currentColor = _initColor;
-            console.log(currentColor);
+            /*** Creating the desired quantity while adding the color step ***/
 
-            for(let i = 0; i < quantity; i++) {                
-                creaUno(i, i*xStep, i*yStep, i*rotStep, scale, currentColor.style.stroke);
+            let nextColorHsl = initColorHsl; 
+            let nextColorString = '';         
+            
+            for(let i = 0; i < quantity; i++) {     
+                /* We need to multiply because the RgbToHsl function returns values from 0 to 1. Hue goes from 0 to 360 and the other two from 0 to 100. */   
+                nextColorString = 'hsl(' + nextColorHsl[0] * 360 + ', ' + nextColorHsl[1] * 100 + '%, ' + nextColorHsl[2] * 100 + '%)';          
 
-                let nextColorRgb = currentColor.style.stroke.split("(")[1].split(")")[0].split(",");
-                let nextColorHsl = rgbToHsl(nextColorRgb[0], nextColorRgb[1], nextColorRgb[2]);
-                nextColorHsl[0] *= 360;
-                nextColorHsl[1] *= 100;
-                nextColorHsl[2] *= 100;
+                creaUno(i, i*xStep, i*yStep, i*rotStep, scale, nextColorString);
 
                 nextColorHsl[0] += colorStep[0];
                 nextColorHsl[1] += colorStep[1];
                 nextColorHsl[2] += colorStep[2];
-
-                currentColor.setAttribute('style', 'stroke: hsl(' + nextColorHsl[0] + ', ' + nextColorHsl[1] + '%, ' + nextColorHsl[2]  + '%)');
             }
         }
         
         function creaUno(id, translateX, translateY, rotation, scale, color){
-            //He preferido hardcodear una vez la curva svg a tener que cargarla del fichero.
+            /* I've chosen to load the path string here (the same as in curve.svg) instead of dealing with loading a SVG file */
             let path = svg.path('M1.99997 773.377C143.51 697.396 287.555 640.247 447.807 623.566C535.813 614.405 629.477 611.585 717.182 625.005C779.037 634.469 835.764 648.614 891.193 677.869C935.125 701.057 975.615 727.515 1018.07 752.926C1061.96 779.195 1114.51 810.634 1166.61 814.675C1255.67 821.58 1347.69 789.862 1416.78 733.62C1547.29 627.387 1661.65 493.899 1818.34 424.152C1896.79 389.232 1966.71 383.753 2049.91 394.116');
             svg.add(path);
             path.fill('none');
@@ -108,6 +102,8 @@
             return path;
         }
 
+        
+        /* I found this function on StackOverflow */
         function rgbToHsl(r, g, b) {
             r /= 255, g /= 255, b /= 255;
 
