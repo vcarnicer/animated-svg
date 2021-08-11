@@ -19,6 +19,15 @@
 
 <body>
     <h1>Animated SVG Example</h1>
+    <form id="inputs">
+        <label for="quantity">Quantity</label>
+        <input type="text" id="quantity" name="quantity">
+        <label for="firstColor">First Color: </label>
+        <input type="text" id="firstColor" name="firstColor">
+        <label for="lastColor">First Color: </label>
+        <input type="text" id="lastColor" name="lastColor">
+    </form>
+
     <div class="svg-container">            
         <!-- In this "svg-container" div we will insert a single <svg>, which nests the generated <path> inside. -->
         <!-- The next comment would be the normal way of loading an SVG, being hardcoded or loaded from the curve.svg file included in this repo. -->
@@ -29,13 +38,19 @@
     </div>
     
     <script>   
-        let svg;     
-        $(document).ready(function() {            
-            svg = SVG().addTo(".svg-container").size(1920, 1080); 
-            creaVarios(25, 'hsl(195, 100%, 44%)', 'hsl(79, 100%, 37%)', 0, 0, 3, 1);           
+        var botonCrear = document.createElement('input');
+        botonCrear.type = "button";
+        botonCrear.value = "Generar";
+        botonCrear.addEventListener('click', function(){            
+            creaVarios($(quantity).val(), 'hsl(195, 100%, 44%)', 'hsl(79, 100%, 37%)', 0, 0, 3, 1);
         });
+        $("#inputs").append(botonCrear);        
+        
+        let svg;               
+        svg = SVG().addTo(".svg-container").size(1920, 1080);
         
         function creaVarios(quantity, initColor, endColor, xStep, yStep, rotStep, scale){
+            $(".svg-container").children().empty();
             /*** Calculating the color step we need for the gradient ***/ 
 
             /* We're applying the color style to a temp span, which always gives RGB format when you retrieve it, no matter what format you set it in. */
