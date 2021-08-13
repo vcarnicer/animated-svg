@@ -24,7 +24,7 @@
         <input type="text" id="quantity" name="quantity">
         <label for="firstColor">First Color: </label>
         <input type="text" id="firstColor" name="firstColor">
-        <label for="lastColor">First Color: </label>
+        <label for="lastColor">Last Color: </label>
         <input type="text" id="lastColor" name="lastColor">
     </form>
 
@@ -40,9 +40,9 @@
     <script>   
         var botonCrear = document.createElement('input');
         botonCrear.type = "button";
-        botonCrear.value = "Generar";
+        botonCrear.value = "Generate";
         botonCrear.addEventListener('click', function(){            
-            creaVarios($(quantity).val(), 'hsl(195, 100%, 44%)', 'hsl(79, 100%, 37%)', 0, 0, 3, 1);
+            creaVarios($(quantity).val(), $(firstColor).val(), $(lastColor).val(), 0, 0, 3, 1);
         });
         $("#inputs").append(botonCrear);        
         
